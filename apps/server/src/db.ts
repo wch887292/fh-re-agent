@@ -1,8 +1,13 @@
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const DB_DIR = path.resolve("data");
+// 本文件位于 apps/server/src/db.ts，上跳一级（src → server）定位 apps/server/data，
+// 数据库路径与启动 cwd 无关（path.resolve("data") 会随 cwd 分叉出多个 reagent.db）
+const HERE = dirname(fileURLToPath(import.meta.url));
+const DB_DIR = path.resolve(HERE, "../data");
 if (!fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });
 }
@@ -54,4 +59,26 @@ if (annoCount.n === 0) {
   annoInsert.run(2, "从客户访谈录音转写提炼卖点", "五条核心卖点清单", "卖点提炼", "待标注");
   annoInsert.run(2, "给客户见证分段并打质量分", "三段式结构附每段评分", "内容质检", "待标注");
   console.log("[db] annotations 表已初始化（含 4 条种子数据）");
+}
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    targetType TEXT NOT NULL,
+    targetId INTEGER NOT NULL,
+    reviewer TEXT DEFAULT '',
+    result TEXT DEFAULT '待审核',
+    comment TEXT DEFAULT '',
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
+`);
+
+const revCount = db.prepare("SELECT COUNT(*) AS n FROM reviews").get() as { n: number };
+if (revCount.n === 0) {
+  const revInsert = db.prepare(
+    "INSERT INTO reviews (targetType, targetId, reviewer, result, comment) VALUES (?, ?, ?, ?, ?)"
+  );
+  revInsert.run("annotation", 1, "张顾问", "待审核", "");
+  revInsert.run("annotation", 2, "", "待审核", "");
+  console.log("[db] reviews 表已初始化（含 2 条种子数据）");
 }
