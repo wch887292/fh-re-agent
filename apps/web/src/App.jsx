@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import DatasetPanel from "./DatasetPanel";
+import AnnotationPanel from "./AnnotationPanel";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("总览");
@@ -36,6 +37,12 @@ export default function App() {
         >
           数据集工程
         </button>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "标注" ? styles.tabBtnActive : {}) }}
+          onClick={() => setActiveTab("标注")}
+        >
+          标注
+        </button>
       </div>
 
       <div style={styles.tabContent}>
@@ -66,6 +73,8 @@ export default function App() {
         )}
 
         {activeTab === "数据集工程" && <DatasetPanel />}
+
+        {activeTab === "标注" && <AnnotationPanel />}
       </div>
     </div>
   );
