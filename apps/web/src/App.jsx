@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import DatasetPanel from "./DatasetPanel";
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState("总览");
   const [modules, setModules] = useState([]);
   const [error, setError] = useState("");
 
@@ -19,18 +21,52 @@ export default function App() {
   return (
     <div style={styles.page}>
       <h1 style={styles.title}>RE-Agent 管理后台</h1>
-      {error ? (
-        <div style={styles.error}>{error}</div>
-      ) : (
-        <div style={styles.grid}>
-          {modules.map((mod) => (
-            <div key={mod.key} style={styles.card}>
-              <h2 style={styles.cardTitle}>{mod.name}</h2>
-              <span style={styles.badge}>planned</span>
-            </div>
-          ))}
-        </div>
-      )}
+      
+      {/* Tab 导航 */}
+      <div style={styles.tabBar}>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "总览" ? styles.tabBtnActive : {}) }}
+          onClick={() => setActiveTab("总览")}
+        >
+          总览
+        </button>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "数据集工程" ? styles.tabBtnActive : {}) }}
+          onClick={() => setActiveTab("数据集工程")}
+        >
+          数据集工程
+        </button>
+      </div>
+
+      <div style={styles.tabContent}>
+        {activeTab === "总览" && (
+          <div>
+            {error ? (
+              <div style={styles.error}>{error}</div>
+            ) : (
+              <div style={styles.grid}>
+                {modules.map((mod) => (
+                  <div key={mod.key} style={styles.card}>
+                    <h2 style={styles.cardTitle}>{mod.name}</h2>
+                    <span
+                      style={{
+                        ...styles.badge,
+                        ...(mod.status === "online"
+                          ? styles.badgeOnline
+                          : {}),
+                      }}
+                    >
+                      {mod.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "数据集工程" && <DatasetPanel />}
+      </div>
     </div>
   );
 }
@@ -49,11 +85,38 @@ const styles = {
     fontSize: "28px",
     color: "#111",
   },
+  tabBar: {
+    display: "flex",
+    gap: "8px",
+    marginBottom: "24px",
+    background: "#fff",
+    borderRadius: "8px",
+    padding: "4px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+  },
+  tabBtn: {
+    padding: "8px 20px",
+    border: "none",
+    background: "transparent",
+    color: "#555",
+    fontSize: "14px",
+    cursor: "pointer",
+    borderRadius: "6px",
+    transition: "all 0.2s",
+  },
+  tabBtnActive: {
+    background: "#e0e7ff",
+    color: "#3730a3",
+    fontWeight: "500",
+  },
+  tabContent: {
+    width: "100%",
+    maxWidth: "800px",
+  },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
     gap: "16px",
-    maxWidth: "720px",
   },
   card: {
     background: "#fff",
@@ -77,8 +140,14 @@ const styles = {
     background: "#e0e7ff",
     color: "#3730a3",
   },
+  badgeOnline: {
+    background: "#d4edda",
+    color: "#155724",
+  },
   error: {
     color: "#d32f2f",
     fontSize: "14px",
+    padding: "16px",
+    textAlign: "center",
   },
 };
