@@ -3,6 +3,7 @@ import DatasetPanel from "./DatasetPanel";
 import AnnotationPanel from "./AnnotationPanel";
 import ReviewPanel from "./ReviewPanel";
 import DashboardPanel from "./DashboardPanel";
+import InferencePanel from "./InferencePanel";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("总览");
@@ -57,6 +58,12 @@ export default function App() {
         >
           看板
         </button>
+        <button
+          style={{ ...styles.tabBtn, ...(activeTab === "模型推理" ? styles.tabBtnActive : {}) }}
+          onClick={() => setActiveTab("模型推理")}
+        >
+          模型推理
+        </button>
       </div>
 
       <div style={styles.tabContent}>
@@ -93,6 +100,8 @@ export default function App() {
         {activeTab === "审核" && <ReviewPanel />}
 
         {activeTab === "看板" && <DashboardPanel />}
+
+        {activeTab === "模型推理" && <InferencePanel />}
       </div>
     </div>
   );

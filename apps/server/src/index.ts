@@ -4,6 +4,7 @@ import { datasetRouter } from "./modules/dataset";
 import { annotationRouter } from "./modules/annotation";
 import { reviewRouter } from "./modules/review";
 import { dashboardRouter } from "./modules/dashboard";
+import { inferenceRouter } from "./modules/inference";
 
 void db; // 触发数据库初始化（建表 + 种子数据）
 
@@ -25,6 +26,7 @@ const MODULES = [
   { key: "annotation", name: "标注", status: "online" },
   { key: "review", name: "审核", status: "online" },
   { key: "dashboard", name: "看板", status: "online" },
+  { key: "inference", name: "模型推理", status: "online" },
 ];
 
 app.get("/api/modules", (req, res) => {
@@ -35,6 +37,7 @@ app.use("/api/datasets", datasetRouter);
 app.use("/api/annotations", annotationRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/inference", inferenceRouter);
 
 app.listen(PORT, () => {
   console.log(`re-agent-server listening on http://localhost:${PORT}`);

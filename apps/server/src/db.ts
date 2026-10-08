@@ -82,3 +82,40 @@ if (revCount.n === 0) {
   revInsert.run("annotation", 2, "", "待审核", "");
   console.log("[db] reviews 表已初始化（含 2 条种子数据）");
 }
+
+// ── 模型推理（R-6）：两张新表，只读消费 datasets，不影响既有三表 ──
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS model_configs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    apiBase TEXT NOT NULL,
+    model TEXT NOT NULL,
+    apiKey TEXT DEFAULT '',
+    status TEXT DEFAULT '在线',
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
+`);
+
+const mcCount = db.prepare("SELECT COUNT(*) AS n FROM model_configs").get() as { n: number };
+if (mcCount.n === 0) {
+  const mcInsert = db.prepare(
+    "INSERT INTO model_configs (name, apiBase, model, apiKey, status) VALUES (?, ?, ?, ?, ?)"
+  );
+  mcInsert.run("演示模型", "https://api.openai.com/v1", "gpt-4o-mini", "", "在线");
+  console.log("[db] model_configs 表已初始化（含 1 条示例配置）");
+}
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS inference_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    modelConfigId INTEGER NOT NULL,
+    datasetId INTEGER NOT NULL,
+    sampleRef TEXT DEFAULT '',
+    prompt TEXT DEFAULT '',
+    status TEXT DEFAULT '待执行',
+    result TEXT DEFAULT '',
+    error TEXT DEFAULT '',
+    createdAt TEXT DEFAULT (datetime('now'))
+  );
+`);
